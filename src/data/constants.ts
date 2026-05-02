@@ -147,9 +147,9 @@ export const NAV_LINKS = [
 ] as const;
 
 export const TERMINAL_LINES: { command: string; output: string }[] = [
-  { command: "whoami", output: "Roshan Neupane" },
+  { command: "who am i", output: "Roshan Neupane" },
   { command: "cat education.txt", output: "BCA — Tribhuvan University" },
-  { command: "echo $LOCATION", output: "Nepal 🇳🇵" },
+  { command: "echo $LOCATION", output: "Nepal" },
   {
     command: "cat skills.txt | head -3",
     output: "Next.js • React • TypeScript",
