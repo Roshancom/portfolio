@@ -1,0 +1,2693 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1, viewport-fit=cover"
+    />
+    <title>Roshan Neupane Portfolio</title>
+    <meta
+      name="description"
+      content="Roshan Neupane — Interactive 3D Portfolio"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <style>
+      *,
+      *::before,
+      *::after {
+        font-family: "Poppins", sans-serif !important;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      html,
+      body {
+        font-family: "Poppins", sans-serif;
+      }
+
+      :root {
+        --bg-deep: #04030a;
+        --bg-mid: #080614;
+        --nebula: #1a0a2e;
+        --gold: #c9a84c;
+        --amber: #e8824a;
+        --blue-e: #3b7dd8;
+        --rose: #c47a8a;
+        --text: #f0ede6;
+        --muted: #8a8070;
+        --panel-bg: rgba(12, 8, 24, 0.82);
+        --panel-border: rgba(201, 168, 76, 0.2);
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-color: var(--bg-deep);
+        color: var(--text);
+        overflow-x: hidden;
+        overscroll-behavior: none;
+      }
+
+      canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        z-index: -1;
+        pointer-events: none;
+      }
+
+      #nebula-bg {
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        pointer-events: none;
+        background: radial-gradient(
+          ellipse 120% 80% at 20% 30%,
+          #1a0a2e 0%,
+          #04030a 60%
+        );
+      }
+      #nebula-bg2 {
+        position: fixed;
+        inset: 0;
+        z-index: -2;
+        pointer-events: none;
+        background: radial-gradient(
+          ellipse 80% 60% at 80% 70%,
+          #0d1a3a 0%,
+          transparent 65%
+        );
+      }
+
+      #scroll-container {
+        height: 700vh;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 1px;
+        pointer-events: none;
+      }
+
+      /* Start Screen */
+      #start-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #04030a;
+        gap: 12px;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        transition: opacity 0.8s ease;
+      }
+
+      #ss-label {
+        font-family: "Poppins", sans-serif;
+        font-size: 14px;
+        font-weight: 300;
+        letter-spacing: 0.18em;
+        color: #8a8070;
+      }
+
+      #start-screen h1,
+      #ss-name {
+        font-family: "Poppins", sans-serif;
+        font-size: 64px;
+        font-weight: 600;
+        color: #f0ede6;
+        background: none;
+        -webkit-text-fill-color: unset;
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+
+      #ss-line {
+        width: 40px;
+        height: 0.5px;
+        background: #c9a84c;
+        margin: 16px auto;
+      }
+
+      #ss-desc {
+        font-family: "Poppins", sans-serif;
+        font-size: 14px;
+        font-weight: 300;
+        color: #8a8070;
+        max-width: 360px;
+        text-align: center;
+        line-height: 1.8;
+        letter-spacing: 0;
+        text-transform: none;
+        margin-bottom: 24px;
+      }
+
+      .loading-dots {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        color: #c9a84c;
+        font-size: 20px;
+      }
+      .loading-dots span {
+        animation: dotBlink 1.2s infinite ease-in-out;
+      }
+      .loading-dots span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .loading-dots span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      @keyframes dotBlink {
+        0%,
+        100% {
+          opacity: 0.2;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      #enter-btn {
+        background: transparent;
+        border: 0.5px solid rgba(201, 168, 76, 0.5);
+        color: #c9a84c;
+        padding: 12px 36px;
+        border-radius: 2px;
+        font-family: "Poppins", sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        cursor: pointer;
+        transition:
+          background 0.3s,
+          border-color 0.3s;
+        display: none;
+      }
+      #enter-btn:hover {
+        background: rgba(201, 168, 76, 0.08);
+        border-color: rgba(201, 168, 76, 0.9);
+      }
+
+      /* Hero Overlay */
+      #hero-overlay {
+        position: fixed;
+        top: 50%;
+        left: 10%;
+        transform: translateY(-50%);
+        z-index: 10;
+      }
+      #hero-overlay h1 {
+        font-family: "Poppins", sans-serif;
+        font-size: 64px;
+        font-weight: 600;
+        color: #f0ede6;
+        background: none;
+        -webkit-text-fill-color: unset;
+        letter-spacing: -0.01em;
+        margin-bottom: 8px;
+      }
+      #hero-overlay h2 {
+        font-family: "Poppins", sans-serif;
+        font-size: 16px;
+        font-weight: 300;
+        color: #8a8070;
+        letter-spacing: 0.06em;
+        margin-bottom: 24px;
+      }
+      .hero-tags {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .pill {
+        background: transparent;
+        border: 1px solid rgba(201, 168, 76, 0.3);
+        color: #c9a84c;
+        border-radius: 2px;
+        font-family: "Poppins", sans-serif;
+        font-size: 11px;
+        font-weight: 400;
+        letter-spacing: 0.08em;
+        padding: 4px 12px;
+      }
+
+      /* HUD Left */
+      #hud-left {
+        position: fixed;
+        left: 24px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        z-index: 100;
+      }
+      .hud-zone-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        position: relative;
+      }
+      .hz-line {
+        width: 24px;
+        height: 1px;
+        background: #8a8070;
+        transition:
+          width 0.3s,
+          background 0.3s;
+      }
+      .hz-label {
+        font-family: "Poppins", sans-serif;
+        font-size: 12px;
+        font-weight: 500;
+        letter-spacing: 0.2em;
+        color: #c9a84c;
+        opacity: 0;
+        transition: opacity 0.3s;
+        white-space: nowrap;
+      }
+      .hud-zone-item.active .hz-line {
+        width: 48px;
+        background: #c9a84c;
+      }
+      .hud-zone-item.active .hz-label {
+        opacity: 1;
+      }
+      .hud-zone-item.done .hz-line {
+        width: 32px;
+        background: rgba(201, 168, 76, 0.4);
+      }
+      #hud-pct-label {
+        font-family: "Poppins", sans-serif;
+        font-size: 10px;
+        font-weight: 300;
+        color: #8a8070;
+        margin-top: 8px;
+      }
+
+      /* Scroll Hint */
+      #scroll-hint {
+        position: fixed;
+        bottom: 32px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        z-index: 10;
+      }
+      #sh-line {
+        width: 1px;
+        height: 40px;
+        background: rgba(201, 168, 76, 0.5);
+        transform-origin: top;
+        animation: scanLine 2s infinite;
+      }
+      @keyframes scanLine {
+        0% {
+          transform: scaleY(0);
+          opacity: 1;
+        }
+        50% {
+          transform: scaleY(1);
+          opacity: 1;
+        }
+        100% {
+          transform: scaleY(1);
+          opacity: 0;
+        }
+      }
+      #sh-text {
+        font-family: "Poppins", sans-serif;
+        font-size: 9px;
+        font-weight: 300;
+        letter-spacing: 0.22em;
+        color: #8a8070;
+      }
+
+      /* Info Panel */
+      #info-panel {
+        position: fixed;
+        right: 24px;
+        top: 50%;
+        transform: translateY(-50%) translateX(120%);
+        width: 320px;
+        background: rgba(12, 8, 24, 0.82);
+        backdrop-filter: blur(20px) saturate(1.4);
+        -webkit-backdrop-filter: blur(20px) saturate(1.4);
+        border: 1px solid rgba(201, 168, 76, 0.2);
+        border-radius: 4px;
+        padding: 28px 24px;
+        box-shadow:
+          0 0 60px rgba(201, 168, 76, 0.04),
+          inset 0 0 0 0.5px rgba(255, 255, 255, 0.04);
+        z-index: 50;
+        opacity: 0;
+        transition:
+          opacity 0.4s,
+          transform 0.4s;
+        pointer-events: none;
+      }
+      #info-panel.visible {
+        pointer-events: auto;
+        transform: translateY(-50%) translateX(0);
+        opacity: 1;
+      }
+      #info-panel::after {
+        content: "";
+        display: block;
+        height: 1px;
+        background: rgba(201, 168, 76, 0.28);
+        margin-bottom: 16px;
+        margin-top: -8px;
+      }
+      #panel-tag {
+        font-family: "Poppins", sans-serif;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        color: #c9a84c;
+        opacity: 0.8;
+        text-transform: none;
+        margin-bottom: 6px;
+      }
+      #panel-title {
+        font-family: "Poppins", sans-serif;
+        font-size: 20px;
+        font-weight: 600;
+        color: #f0ede6;
+        line-height: 1.2;
+        margin-top: 6px;
+        letter-spacing: -0.01em;
+      }
+      #panel-sub {
+        font-family: "Poppins", sans-serif;
+        font-size: 12px;
+        font-weight: 300;
+        color: #8a8070;
+        letter-spacing: 0.02em;
+        margin-bottom: 16px;
+      }
+      #panel-divider {
+        height: 1px;
+        background: rgba(201, 168, 76, 0.15);
+        margin: 14px 0;
+      }
+      #panel-body {
+        font-family: "Poppins", sans-serif;
+        font-size: 13px;
+        font-weight: 300;
+        line-height: 1.85;
+        color: rgba(240, 237, 230, 0.7);
+      }
+
+      .tag-pill {
+        display: inline-block;
+        background: transparent;
+        border: 0.5px solid rgba(201, 168, 76, 0.35);
+        color: #c9a84c;
+        border-radius: 2px;
+        padding: 3px 8px;
+        font-size: 10px;
+        font-family: "Poppins", sans-serif;
+        font-weight: 400;
+        letter-spacing: 0.06em;
+        margin-right: 4px;
+        margin-bottom: 4px;
+      }
+      .tag-pill.cyan,
+      .tag-pill.green,
+      .tag-pill.amber,
+      .tag-pill.pink {
+        background: transparent;
+        border: 0.5px solid rgba(201, 168, 76, 0.35);
+        color: #c9a84c;
+      }
+
+      .btn-action {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: transparent;
+        border: 0.5px solid rgba(201, 168, 76, 0.4);
+        color: #c9a84c;
+        border-radius: 2px;
+        font-family: "Poppins", sans-serif;
+        font-size: 11px;
+        font-weight: 500;
+        letter-spacing: 0.12em;
+        padding: 8px 16px;
+        text-decoration: none;
+        transition: all 0.2s;
+        cursor: pointer;
+        width: 100%;
+      }
+      .btn-action.btn-restart {
+        font-size: 10px;
+        font-weight: 400;
+        letter-spacing: 0.12em;
+      }
+      .btn-action:hover {
+        background: rgba(201, 168, 76, 0.08);
+        border-color: rgba(201, 168, 76, 0.7);
+      }
+      .btn-action.primary {
+        background: rgba(59, 125, 216, 0.15);
+        border-color: rgba(59, 125, 216, 0.5);
+        color: #a8c4f0;
+      }
+      .btn-action.primary:hover {
+        background: rgba(59, 125, 216, 0.25);
+      }
+
+      /* Timeline UI */
+      #timeline {
+        position: fixed;
+        left: 80px;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 32px;
+        z-index: 20;
+        border-left: 1px solid rgba(201, 168, 76, 0.3);
+        border-image: none;
+        padding-left: 16px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s;
+      }
+      #timeline.visible {
+        opacity: 1;
+      }
+      .timeline-node {
+        position: relative;
+        transform: translateX(-20px);
+        opacity: 0;
+        transition: all 0.4s ease-out;
+      }
+      .timeline-node.show {
+        transform: translateX(0);
+        opacity: 1;
+      }
+      .timeline-node::before {
+        content: "";
+        position: absolute;
+        left: -21px;
+        top: 5px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #e8824a;
+      }
+      .timeline-node:nth-child(2)::before {
+        background: #e8824a;
+      }
+      .timeline-node:nth-child(3)::before {
+        background: #c9a84c;
+        box-shadow: 0 0 8px #c9a84c;
+        animation: pulseNode 2s infinite;
+      }
+      .timeline-date {
+        font-size: 10px;
+        color: #8a8070;
+        letter-spacing: 0.08em;
+        margin-bottom: 2px;
+        text-transform: uppercase;
+      }
+      .timeline-role {
+        font-family: "Poppins", sans-serif;
+        font-size: 11px;
+        font-weight: 500;
+        color: #f0ede6;
+      }
+
+      @keyframes pulseNode {
+        0%,
+        100% {
+          box-shadow: 0 0 4px #c9a84c;
+        }
+        50% {
+          box-shadow: 0 0 12px #c9a84c;
+        }
+      }
+
+      #vignette {
+        position: fixed;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 100% 100% at 50% 50%,
+          transparent 40%,
+          rgba(4, 3, 10, 0.85) 100%
+        );
+        pointer-events: none;
+        z-index: 5;
+      }
+      #grain-canvas {
+        position: fixed;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.35;
+        mix-blend-mode: overlay;
+        pointer-events: none;
+        z-index: 6;
+      }
+
+      #cursor-ring {
+        position: fixed;
+        width: 28px;
+        height: 28px;
+        border: 0.5px solid rgba(201, 168, 76, 0.6);
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+        transition:
+          transform 0.12s,
+          width 0.2s,
+          height 0.2s,
+          opacity 0.2s;
+      }
+      #cursor-dot {
+        position: fixed;
+        width: 4px;
+        height: 4px;
+        background: #c9a84c;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+        transition: transform 0.05s;
+      }
+      @media (pointer: coarse) {
+        #cursor-ring,
+        #cursor-dot {
+          display: none;
+        }
+        body {
+          cursor: auto;
+        }
+      }
+
+      #sweep-line {
+        position: fixed;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: rgba(201, 168, 76, 0.3);
+        top: -2px;
+        pointer-events: none;
+        z-index: 200;
+      }
+
+      @media (max-width: 768px) {
+        #hero-overlay {
+          left: 16px;
+          right: 16px;
+          width: calc(100% - 32px);
+        }
+        #hero-overlay h1 {
+          font-size: 36px;
+          line-height: 1.1;
+          word-break: break-word;
+        }
+        #hero-overlay h2 {
+          font-size: 13px;
+          margin-bottom: 16px;
+        }
+        .hero-tags {
+          gap: 8px;
+          flex-wrap: wrap;
+        }
+        .pill {
+          font-size: 10px;
+          padding: 3px 9px;
+        }
+
+        #ss-name {
+          font-size: 40px;
+          text-align: center;
+          padding: 0 16px;
+        }
+        #ss-desc {
+          max-width: calc(100% - 40px);
+          font-size: 13px;
+        }
+        #ss-label {
+          font-size: 11px;
+          text-align: center;
+        }
+
+        #info-panel {
+          width: 100%;
+          right: 0;
+          left: 0;
+          top: auto;
+          bottom: 0;
+          max-height: 65vh;
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+          transform: translateY(100%);
+          border-radius: 12px 12px 0 0;
+          border-bottom: none;
+          border-left: none;
+          border-right: none;
+          padding: 16px 16px 32px;
+          box-sizing: border-box;
+        }
+        #info-panel.visible {
+          transform: translateY(0);
+        }
+        #panel-title {
+          font-size: 17px;
+        }
+        #panel-body {
+          font-size: 12px;
+          line-height: 1.75;
+        }
+        .tag-pill {
+          font-size: 9px;
+          padding: 2px 7px;
+        }
+        .btn-action {
+          font-size: 11px;
+          padding: 10px 14px;
+          margin-bottom: 8px;
+        }
+
+        #hud-left {
+          display: none;
+        }
+        #timeline {
+          display: none;
+        }
+        #scroll-hint {
+          bottom: 16px;
+        }
+      }
+
+      @media (max-width: 374px) {
+        #hero-overlay h1 {
+          font-size: 28px;
+        }
+        #ss-name {
+          font-size: 32px;
+        }
+        #info-panel {
+          max-height: 70vh;
+          padding: 12px 12px 28px;
+        }
+      }
+
+      /* ── Certificate thumbnails (inside info panel) ─────────────────── */
+      .cert-thumbs-row {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+      }
+      .cert-thumb {
+        flex: 1 1 90px;
+        max-width: 130px;
+        cursor: pointer;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid rgba(201, 168, 76, 0.25);
+        background: rgba(255, 255, 255, 0.04);
+        transition:
+          border-color 0.25s,
+          transform 0.25s,
+          box-shadow 0.25s;
+        position: relative;
+      }
+      .cert-thumb:hover,
+      .cert-thumb:focus-visible {
+        border-color: rgba(201, 168, 76, 0.7);
+        transform: scale(1.04);
+        box-shadow: 0 0 18px rgba(201, 168, 76, 0.18);
+        outline: none;
+      }
+      .cert-thumb:active {
+        transform: scale(0.98);
+      }
+      .cert-thumb img {
+        display: block;
+        width: 100%;
+        aspect-ratio: 3 / 4;
+        object-fit: cover;
+        object-position: top center;
+        pointer-events: none;
+      }
+      .cert-thumb-label {
+        font-family: "Poppins", sans-serif;
+        font-size: 10px;
+        font-weight: 500;
+        letter-spacing: 0.07em;
+        color: rgba(255, 255, 255, 0.7);
+        text-align: center;
+        padding: 6px 4px 7px;
+        background: rgba(12, 8, 24, 0.7);
+      }
+      .cert-thumb-hint {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Poppins", sans-serif;
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        color: rgba(201, 168, 76, 0.9);
+        background: rgba(0, 0, 0, 0.45);
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+      .cert-thumb:hover .cert-thumb-hint,
+      .cert-thumb:focus-visible .cert-thumb-hint {
+        opacity: 1;
+      }
+
+      /* ── Certificate modal / lightbox ─────────────────────────────────── */
+      #cert-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        box-sizing: border-box;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+      }
+      #cert-modal.open {
+        pointer-events: auto;
+        opacity: 1;
+      }
+      #cert-modal-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(4, 2, 12, 0.88);
+        backdrop-filter: blur(18px) saturate(1.3);
+        -webkit-backdrop-filter: blur(18px) saturate(1.3);
+      }
+      #cert-modal-content {
+        position: relative;
+        z-index: 1;
+        background: rgba(14, 9, 28, 0.92);
+        border: 1px solid rgba(201, 168, 76, 0.28);
+        border-radius: 10px;
+        padding: 20px 20px 16px;
+        max-width: min(560px, 100%);
+        width: 100%;
+        box-shadow: 0 0 80px rgba(201, 168, 76, 0.08);
+        transform: scale(0.92) translateY(24px);
+        transition:
+          transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+          opacity 0.3s;
+        opacity: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      #cert-modal.open #cert-modal-content {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+      #cert-modal-close {
+        position: absolute;
+        top: 12px;
+        right: 14px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 50%;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 15px;
+        line-height: 1;
+        transition:
+          background 0.2s,
+          color 0.2s,
+          transform 0.2s;
+      }
+      #cert-modal-close:hover {
+        background: rgba(201, 168, 76, 0.18);
+        color: #fff;
+        transform: scale(1.1);
+      }
+      #cert-modal-close:active {
+        transform: scale(0.95);
+      }
+      #cert-modal-title {
+        font-family: "Poppins", sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        color: #c9a84c;
+        padding-right: 36px;
+      }
+      #cert-modal-sub {
+        font-family: "Poppins", sans-serif;
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.45);
+        letter-spacing: 0.05em;
+        margin-top: -4px;
+      }
+      #cert-modal-img-wrap {
+        overflow-y: auto;
+        overflow-x: hidden;
+        max-height: 70vh;
+        border-radius: 6px;
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-y pinch-zoom;
+        background: rgba(255, 255, 255, 0.03);
+      }
+      #cert-modal-img {
+        display: block;
+        width: 100%;
+        height: auto;
+        border-radius: 4px;
+        pointer-events: none;
+      }
+      @media (max-width: 768px) {
+        #cert-modal {
+          padding: 10px;
+          align-items: flex-end;
+        }
+        #cert-modal-content {
+          border-radius: 12px 12px 8px 8px;
+          max-width: 100%;
+        }
+        #cert-modal-img-wrap {
+          max-height: 65vh;
+        }
+        .cert-thumb {
+          max-width: 50%;
+          flex-basis: 45%;
+        }
+      }
+      @media (max-width: 374px) {
+        #cert-modal-img-wrap {
+          max-height: 60vh;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="nebula-bg"></div>
+    <div id="nebula-bg2"></div>
+    <canvas id="three-canvas"></canvas>
+    <div id="vignette"></div>
+    <canvas id="grain-canvas"></canvas>
+    <div id="sweep-line"></div>
+    <div id="cursor-ring"></div>
+    <div id="cursor-dot"></div>
+
+    <div id="start-screen">
+      <div id="ss-label" class="text-sm">
+        Frontend Engineer · Kathmandu, Nepal
+      </div>
+      <h1 id="ss-name">Roshan Neupane</h1>
+      <p id="ss-desc">
+        Building scalable interfaces with React, Next.js & TypeScript
+      </p>
+      <div class="loading-dots"><span>·</span><span>·</span><span>·</span></div>
+      <button id="enter-btn">Enter</button>
+    </div>
+
+    <div id="hero-overlay">
+      <h1>ROSHAN NEUPANE</h1>
+      <h2>Frontend Software Engineer</h2>
+      <div class="hero-tags">
+        <span class="pill">React</span>
+        <span class="pill">Next.js</span>
+        <span class="pill">TypeScript</span>
+        <span class="pill">Node.js</span>
+        <span class="pill">Express.js</span>
+      </div>
+    </div>
+
+    <div id="hud-left">
+      <div class="hud-zone-item" data-zone="1">
+        <div class="hz-line"></div>
+        <span class="hz-label">hero</span>
+      </div>
+      <div class="hud-zone-item" data-zone="2">
+        <div class="hz-line"></div>
+        <span class="hz-label">about</span>
+      </div>
+      <div class="hud-zone-item" data-zone="3">
+        <div class="hz-line"></div>
+        <span class="hz-label">skills</span>
+      </div>
+      <div class="hud-zone-item" data-zone="4">
+        <div class="hz-line"></div>
+        <span class="hz-label">work</span>
+      </div>
+      <div class="hud-zone-item" data-zone="5">
+        <div class="hz-line"></div>
+        <span class="hz-label">projects</span>
+      </div>
+      <div class="hud-zone-item" data-zone="6">
+        <div class="hz-line"></div>
+        <span class="hz-label">education</span>
+      </div>
+      <div class="hud-zone-item" data-zone="7">
+        <div class="hz-line"></div>
+        <span class="hz-label">contact</span>
+      </div>
+      <div id="hud-pct-label">0%</div>
+    </div>
+
+    <div id="info-panel">
+      <div id="panel-tag">ABOUT ME</div>
+      <div id="panel-title">Roshan Neupane</div>
+      <div id="panel-sub">Kathmandu, Nepal</div>
+      <div id="panel-divider"></div>
+      <div id="panel-body"></div>
+    </div>
+
+    <div id="timeline">
+      <div class="timeline-node">
+        <div class="timeline-date">Feb–Apr 2023</div>
+        <div class="timeline-role" style="color: #e8824a">Intern</div>
+      </div>
+      <div class="timeline-node">
+        <div class="timeline-date">May–Oct 2023</div>
+        <div class="timeline-role" style="color: #e8824a">Trainee</div>
+      </div>
+      <div class="timeline-node">
+        <div class="timeline-date">Nov 2023–Present</div>
+        <div class="timeline-role" style="color: #c9a84c">Frontend Dev</div>
+      </div>
+    </div>
+
+    <div id="scroll-hint">
+      <div id="sh-line"></div>
+      <span id="sh-text">scroll</span>
+    </div>
+    <div id="scroll-container"></div>
+
+    <!-- Certificate modal / lightbox -->
+    <div
+      id="cert-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="cert-modal-title"
+    >
+      <div id="cert-modal-backdrop"></div>
+      <div id="cert-modal-content">
+        <button id="cert-modal-close" aria-label="Close certificate preview">
+          ✕
+        </button>
+        <div id="cert-modal-title"></div>
+        <div id="cert-modal-sub"></div>
+        <div id="cert-modal-img-wrap">
+          <img id="cert-modal-img" src="" alt="" draggable="false" />
+        </div>
+      </div>
+    </div>
+
+    <script defer>
+      // --- DATA ---
+      const ZONES_DATA = [
+        {
+          id: 1,
+          name: "HERO",
+          zRange: [12, -4],
+          content: null, // Handled by hero overlay
+        },
+        {
+          id: 2,
+          name: "ABOUT",
+          zRange: [-4, -18],
+          tag: "ABOUT ME",
+          title: "Roshan Neupane",
+          sub: "Kathmandu, Nepal",
+          body: `
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <div>· roshanneupane676@gmail.com</div>
+                        <div>· 9761682980</div>
+                        <div>· Frontend Software Engineer</div>
+                        <div style="margin-top:8px; color:rgba(255,255,255,0.7);">
+                            Passionate about performance, clean code, and scalable UI. Building real-world products.
+                        </div>
+                    </div>
+                `,
+        },
+        {
+          id: 3,
+          name: "SKILLS",
+          zRange: [-18, -34],
+          tag: "TECH SKILLS",
+          title: "Arsenal",
+          sub: "Frontend · Styling · State · Tools",
+          body: `
+                    <div>
+                        <div style="margin-bottom:8px; font-size:11px; color:var(--muted)">FRONTEND</div>
+                        <span class="tag-pill">React</span><span class="tag-pill">Next.js</span>
+                        <span class="tag-pill">TypeScript</span><span class="tag-pill">JavaScript</span>
+                        <span class="tag-pill">HTML</span><span class="tag-pill">CSS</span>
+                    </div>
+                    <div style="margin-top:12px;">
+                        <div style="margin-bottom:8px; font-size:11px; color:var(--muted)">STYLING</div>
+                        <span class="tag-pill cyan">Tailwind CSS</span><span class="tag-pill cyan">Styled Components</span>
+                        <span class="tag-pill cyan">CSS Modules</span><span class="tag-pill cyan">Sass</span>
+                    </div>
+                    <div style="margin-top:12px;">
+                        <div style="margin-bottom:8px; font-size:11px; color:var(--muted)">STATE & DATA</div>
+                        <span class="tag-pill green">Zustand</span><span class="tag-pill green">React Query</span>
+                        <span class="tag-pill green">TanStack Table</span><span class="tag-pill green">Formik/RHF</span>
+                        <span class="tag-pill green">Zod/Yup</span><span class="tag-pill green">Jest</span>
+                    </div>
+                    <div style="margin-top:12px;">
+                        <div style="margin-bottom:8px; font-size:11px; color:var(--muted)">TOOLS</div>
+                        <span class="tag-pill amber">Git</span><span class="tag-pill amber">Postman</span>
+                        <span class="tag-pill amber">Redis</span>
+                    </div>
+                `,
+        },
+        {
+          id: 4,
+          name: "WORK",
+          zRange: [-34, -60],
+          tag: "EXPERIENCE",
+          title: "Frontend Developer",
+          sub: "Hazesoft Pvt Ltd · Feb 2023 – Apr 2026",
+          body: `
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                        <div>· Engineered high-performance e-commerce interfaces</div>
+                        <div>· Optimized API data-fetching layout stability</div>
+                        <div>· Jest test coverage scaled to 65%+</div>
+                        <div>· Reduced production UI regressions</div>
+                    </div>
+                    <div style="margin-top:12px;">
+                        <span class="tag-pill">Next.js</span><span class="tag-pill">Zustand</span>
+                        <span class="tag-pill">React Query</span><span class="tag-pill">Jest</span>
+                        <span class="tag-pill">Redis</span>
+                    </div>
+                    <div id="panel-divider" style="margin: 16px 0;"></div>
+                    <div style="color: #e8824a; font-size:14px;">Trainee · May–Oct 2023</div>
+                    <div style="color: var(--muted); font-size:14px; margin-top:4px;">Intern · Feb–Apr 2023</div>
+                `,
+        },
+        {
+          id: 5,
+          name: "PROJ",
+          zRange: [-60, -80],
+          tag: "PROJECTS",
+          title: "4 Live Projects",
+          sub: "E-commerce · Platform · SaaS",
+          body: `
+                    <div style="display:flex; flex-direction:column; gap:16px;">
+                        <div>
+                            <strong style="color:#c9a84c">Reuseit.se</strong>
+                            <div style="color:rgba(255,255,255,0.7); font-size:14px; margin:4px 0;">Refurbished tech store. Mailchimp + Redis caching.</div>
+                            <span class="tag-pill pink">Next.js</span><span class="tag-pill pink">Recombee</span>
+                        </div>
+                        <div>
+                            <strong style="color:#c9a84c">Zonefloorball</strong>
+                            <div style="color:rgba(255,255,255,0.7); font-size:14px; margin:4px 0;">Floorball gear store. Lipscore reviews.</div>
+                            <span class="tag-pill pink">Next.js</span><span class="tag-pill pink">Redis</span>
+                        </div>
+                        <div>
+                            <strong style="color:#c9a84c">Arbetsbyxor</strong>
+                            <div style="color:rgba(255,255,255,0.7); font-size:14px; margin:4px 0;">Workwear store, solo-built CMS builder.</div>
+                            <span class="tag-pill pink">Next.js</span><span class="tag-pill pink">Formik</span>
+                        </div>
+                        <div>
+                            <strong style="color:#c9a84c">ParchaHub</strong>
+                            <div style="color:rgba(255,255,255,0.7); font-size:14px; margin:4px 0;">Nepali digital pamphlet platform.</div>
+                            <span class="tag-pill pink">Next.js</span><span class="tag-pill pink">Express</span><span class="tag-pill pink">Drizzle</span>
+                        </div>
+                    </div>
+                `,
+        },
+        {
+          id: 6,
+          name: "EDU",
+          zRange: [-80, -98],
+          tag: "EDUCATION",
+          title: "BCA — Tribhuvan University",
+          sub: "2023 – Present · Kathmandu, Nepal",
+          body: `
+                    <div style="display:flex; flex-direction:column; gap:14px;">
+                        <div>
+                            <div>· <strong>Bachelor of Computer Applications</strong></div>
+                            <div style="color:#c9a84c; font-size:14px; margin-top:2px;">Ongoing</div>
+                        </div>
+                        <div>
+                            <div>· <strong>High School Science (+2)</strong></div>
+                            <div style="color:var(--muted); font-size:14px; margin-top:2px;">Kantipur College, Biratnagar · 2018–2020</div>
+                        </div>
+                        <div>
+                            <div>· <strong>SEE</strong></div>
+                            <div style="color:var(--muted); font-size:14px; margin-top:2px;">Optional Math & Computer Science<br/>Mount Everest Boarding · 2018</div>
+                        </div>
+                    </div>
+                    <div style="margin-top:14px; font-size:10px; letter-spacing:0.1em; color:rgba(201,168,76,0.6);">
+                        ↖ Click the certificate panels in the scene to view full-size
+                    </div>
+                `,
+        },
+        {
+          id: 7,
+          name: "CONTACT",
+          zRange: [-98, -1000],
+          tag: "CONTACT",
+          title: "Let's Build Together",
+          sub: "Open to roles & freelance projects",
+          body: `
+                    <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:24px;">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            roshanneupane676@gmail.com
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            9761682980
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            Kathmandu, Nepal
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:12px; margin-bottom: 24px;">
+                        <a href="https://www.linkedin.com/in/roshan-neupane-945209272/" class="btn-action primary" target="_blank">LinkedIn</a>
+                        <a href="https://github.com/Roshancom" class="btn-action" target="_blank">GitHub</a>
+                    </div>
+                    <button class="btn-action btn-restart" onclick="window.scrollTo({top:0, behavior:'smooth'})">BACK TO START ↑</button>
+                `,
+        },
+      ];
+
+      // --- UTILS ---
+      const textSpriteEntries = [];
+
+      function rebuildCanvasTextures() {
+        textSpriteEntries.forEach((entry) => {
+          const { ctx, canvas, texture, text, color, fontSize, weight } = entry;
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = color;
+          ctx.font = `${weight} ${fontSize}px "Poppins", sans-serif`;
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+          texture.needsUpdate = true;
+        });
+      }
+
+      function makeTextSprite(
+        text,
+        color = "#ffffff",
+        fontSize = 32,
+        weight = 500,
+      ) {
+        const canvas = document.createElement("canvas");
+        canvas.width = 256;
+        canvas.height = 64;
+        const ctx = canvas.getContext("2d");
+        ctx.fillStyle = color;
+        ctx.font = `${weight} ${fontSize}px "Poppins", sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(text, canvas.width / 2, canvas.height / 2);
+        const texture = new THREE.CanvasTexture(canvas);
+        textSpriteEntries.push({
+          canvas,
+          ctx,
+          texture,
+          text,
+          color,
+          fontSize,
+          weight,
+        });
+        const mat = new THREE.SpriteMaterial({
+          map: texture,
+          transparent: true,
+        });
+        const sprite = new THREE.Sprite(mat);
+        sprite.scale.set(2, 0.5, 1);
+        return sprite;
+      }
+
+      // --- THREE.JS SETUP ---
+      const canvas = document.getElementById("three-canvas");
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+      });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      renderer.setClearColor(0x04030a, 1);
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x04030a);
+      scene.fog = new THREE.FogExp2(0x04030a, 0.018);
+
+      const camera = new THREE.PerspectiveCamera(
+        window.innerWidth < 768 ? 75 : 55,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        300,
+      );
+      camera.position.set(0, 3, 12);
+
+      // Lights
+      scene.add(new THREE.AmbientLight(0x0d0820, 1.5));
+      scene.add(new THREE.HemisphereLight(0x1a0a2e, 0x04030a, 0.8));
+      const mainLight = new THREE.PointLight(0xc9a84c, 2, 20);
+      scene.add(mainLight);
+
+      const zoneShapes = [];
+
+      // Stars
+      const starMaterials = [];
+      const createStars = (count, color, size) => {
+        const geo = new THREE.BufferGeometry();
+        const posArray = new Float32Array(count * 3);
+        for (let i = 0; i < count * 3; i += 3) {
+          posArray[i] = (Math.random() - 0.5) * 200;
+          posArray[i + 1] = (Math.random() - 0.5) * 200;
+          posArray[i + 2] = (Math.random() - 0.5) * 200;
+        }
+        geo.setAttribute("position", new THREE.BufferAttribute(posArray, 3));
+        const mat = new THREE.PointsMaterial({
+          color: color,
+          size: size,
+          transparent: true,
+          opacity: 0.8,
+        });
+        starMaterials.push(mat);
+        const pts = new THREE.Points(geo, mat);
+        scene.add(pts);
+      };
+      createStars(1800, 0xffeedd, 0.08); // Group A
+      createStars(800, 0xc9a84c, 0.12); // Group B
+      createStars(400, 0xa8c4f0, 0.18); // Group C
+
+      // Nebula Dust
+      const dustGeo = new THREE.BufferGeometry();
+      const dustCount = 500;
+      const dustPos = new Float32Array(dustCount * 3);
+      const dustColors = new Float32Array(dustCount * 3);
+      const color1 = new THREE.Color(0x1a0a2e);
+      const color2 = new THREE.Color(0x0d1a3a);
+      for (let i = 0; i < dustCount; i++) {
+        dustPos[i * 3] = (Math.random() - 0.5) * 60;
+        dustPos[i * 3 + 1] = (Math.random() - 0.5) * 20;
+        dustPos[i * 3 + 2] = (Math.random() - 0.5) * 120 - 40;
+        const mixColor = color1.clone().lerp(color2, Math.random());
+        dustColors[i * 3] = mixColor.r;
+        dustColors[i * 3 + 1] = mixColor.g;
+        dustColors[i * 3 + 2] = mixColor.b;
+      }
+      dustGeo.setAttribute("position", new THREE.BufferAttribute(dustPos, 3));
+      dustGeo.setAttribute("color", new THREE.BufferAttribute(dustColors, 3));
+      const dustMat = new THREE.PointsMaterial({
+        size: 3,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.06,
+      });
+      const dustGroup = new THREE.Points(dustGeo, dustMat);
+      scene.add(dustGroup);
+
+      // Energy Filaments
+      const veinMats = [];
+      for (let i = 0; i < 20; i++) {
+        const pts = [];
+        for (let j = 0; j < 6; j++) {
+          pts.push(
+            new THREE.Vector3((Math.random() - 0.5) * 12, -1.5, -j * 24),
+          );
+        }
+        const curve = new THREE.CatmullRomCurve3(pts);
+        const isVein = i < 8;
+        const color = i % 2 === 0 ? 0xc9a84c : 0x3b7dd8;
+        const tubeMat = new THREE.MeshBasicMaterial({
+          color: color,
+          transparent: true,
+          opacity: isVein ? 0.6 : 0.25,
+        });
+        if (isVein) veinMats.push(tubeMat);
+        const tube = new THREE.Mesh(
+          new THREE.TubeGeometry(curve, 60, isVein ? 0.03 : 0.015, 6, false),
+          tubeMat,
+        );
+        scene.add(tube);
+      }
+
+      // Zone platforms
+      function makeDisc(zoneZ, accentColor) {
+        const disc1 = new THREE.Mesh(
+          new THREE.CylinderGeometry(3.5, 3.5, 0.06, 64),
+          new THREE.MeshStandardMaterial({
+            color: 0x0d0820,
+            metalness: 0.9,
+            roughness: 0.1,
+            emissive: accentColor,
+            emissiveIntensity: 0.4,
+          }),
+        );
+        disc1.position.set(0, -1.5, zoneZ);
+        const disc2 = new THREE.Mesh(
+          new THREE.CylinderGeometry(4.2, 4.2, 0.02, 64),
+          new THREE.MeshStandardMaterial({
+            color: 0x0d0820,
+            emissive: accentColor,
+            emissiveIntensity: 0.6,
+          }),
+        );
+        disc2.position.set(0, -1.52, zoneZ);
+        scene.add(disc1, disc2);
+
+        const pl1 = new THREE.PointLight(0xc9a84c, 3, 12);
+        pl1.position.set(0, 1.5, zoneZ);
+        const pl2 = new THREE.PointLight(0x3b7dd8, 1.5, 8);
+        pl2.position.set(2, 2, zoneZ + 2);
+        scene.add(pl1, pl2);
+      }
+
+      makeDisc(-15, 0x3b7dd8); // About
+      makeDisc(-35, 0xc9a84c); // Skills
+      makeDisc(-52, 0xe8824a); // Work
+      makeDisc(-78, 0xc9a84c); // Projects
+      makeDisc(-95, 0xc47a8a); // Education
+      makeDisc(-108, 0x3b7dd8); // Contact
+
+      // Z1: HERO
+      const icoGeo = new THREE.IcosahedronGeometry(1.8, 1);
+      const icoMat = new THREE.MeshBasicMaterial({
+        color: 0xc9a84c,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.35,
+      });
+      const icosahedron = new THREE.Mesh(icoGeo, icoMat);
+      const icoInnerGeo = new THREE.IcosahedronGeometry(1.5, 0);
+      const icoInnerMat = new THREE.MeshStandardMaterial({
+        color: 0x0d0820,
+        emissive: 0xc9a84c,
+        emissiveIntensity: 0.15,
+      });
+      const icoInner = new THREE.Mesh(icoInnerGeo, icoInnerMat);
+      scene.add(icosahedron);
+      scene.add(icoInner);
+      zoneShapes.push(icosahedron);
+      zoneShapes.push(icoInner);
+
+      // Z2: ABOUT
+      const ringGeo = new THREE.TorusGeometry(1.2, 0.04, 8, 80);
+      const torus = new THREE.Mesh(
+        ringGeo,
+        new THREE.MeshBasicMaterial({
+          color: 0x3b7dd8,
+          transparent: true,
+          opacity: 0.6,
+        }),
+      );
+      torus.position.set(-3, 0.5, -15);
+      const torus2 = new THREE.Mesh(
+        ringGeo,
+        new THREE.MeshBasicMaterial({
+          color: 0xc9a84c,
+          transparent: true,
+          opacity: 0.4,
+        }),
+      );
+      torus2.position.set(-3, 0.5, -15);
+      torus2.rotation.x = Math.PI / 2;
+      scene.add(torus);
+      scene.add(torus2);
+
+      const floatSprites = [
+        makeTextSprite("< />", "#f0ede6", 40),
+        makeTextSprite("{ }", "#c9a84c", 40),
+        makeTextSprite("=>", "#3b7dd8", 40),
+      ];
+      floatSprites[0].position.set(-5, 2, -18);
+      scene.add(floatSprites[0]);
+      floatSprites[1].position.set(4, 3, -12);
+      scene.add(floatSprites[1]);
+      floatSprites[2].position.set(-4, 1, -20);
+      scene.add(floatSprites[2]);
+
+      // Z3: SKILLS
+      const octahedron = new THREE.Mesh(
+        new THREE.OctahedronGeometry(1.0),
+        new THREE.MeshBasicMaterial({
+          color: 0xc9a84c,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.5,
+        }),
+      );
+      octahedron.position.set(0, 1, -35);
+      scene.add(octahedron);
+      zoneShapes.push(octahedron);
+
+      const skillNames = [
+        "React",
+        "Next.js",
+        "TS",
+        "Tailwind",
+        "Zustand",
+        "Query",
+        "Table",
+        "Jest",
+        "Zod",
+        "Redis",
+        "Git",
+        "Formik",
+        "Sass",
+      ];
+      const skillColors = [0xc9a84c, 0xe8824a, 0x3b7dd8, 0xc47a8a];
+      const skillOrbs = [];
+      const numOrbs = window.innerWidth < 768 ? 8 : 13;
+
+      for (let i = 0; i < numOrbs; i++) {
+        const mat = new THREE.MeshStandardMaterial({
+          color: skillColors[i % skillColors.length],
+        });
+        const orb = new THREE.Mesh(new THREE.SphereGeometry(0.15), mat);
+        scene.add(orb);
+        const label = makeTextSprite(skillNames[i], "#ffffff", 24);
+        scene.add(label);
+        skillOrbs.push({
+          mesh: orb,
+          label: label,
+          radius: 2.5 + Math.random() * 1.5,
+          speed: 0.3 + Math.random() * 0.5,
+          offset: Math.random() * Math.PI * 2,
+          baseY: 0.5 + Math.random() * 1.5,
+          zoneZ: -35,
+          zoneX: 0,
+        });
+      }
+
+      document.fonts.ready.then(() => {
+        rebuildCanvasTextures();
+      });
+
+      // Z4: WORK
+      const workRings = [];
+      for (let i = 0; i < 3; i++) {
+        const rg = new THREE.RingGeometry(0.8, 1.0, 32);
+        const rm = new THREE.MeshBasicMaterial({
+          color: 0xe8824a,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.3 + i * 0.1,
+        });
+        const ring = new THREE.Mesh(rg, rm);
+        ring.position.set([-5, 0, 5][i], -0.5, [-48, -52, -56][i]);
+        ring.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
+        workRings.push(ring);
+        scene.add(ring);
+      }
+
+      const beamGeo = new THREE.CylinderGeometry(0.05, 0.05, 12);
+      const beamMat = new THREE.MeshStandardMaterial({
+        color: 0xe8824a,
+        emissive: 0xe8824a,
+      });
+      const beam = new THREE.Mesh(beamGeo, beamMat);
+      beam.rotation.z = Math.PI / 2;
+      beam.rotation.y = Math.PI / 8;
+      beam.position.set(0, -0.5, -52);
+      scene.add(beam);
+
+      // Z5: PROJECTS
+      const torusKnot = new THREE.Mesh(
+        new THREE.TorusKnotGeometry(0.7, 0.12, 120, 8),
+        new THREE.MeshBasicMaterial({
+          color: 0xc9a84c,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.45,
+        }),
+      );
+      torusKnot.position.set(0, 1.5, -78);
+      scene.add(torusKnot);
+      zoneShapes.push(torusKnot);
+
+      const panelMeshes = [];
+      const pColors = [0xc9a84c, 0x3b7dd8, 0xc47a8a, 0xe8824a];
+      const pPos = [
+        [-4.5, 1, -74],
+        [4.5, 1, -74],
+        [-4.5, 1, -82],
+        [4.5, 1, -82],
+      ];
+      const pImages = [
+        "/reuseit.png",
+        "/sailracing.webp",
+        "/zonefloorball.webp",
+        "/arbetsbyxor.png",
+      ];
+      const pAlts = [
+        "Reuseit.se – Refurbished tech marketplace",
+        "Sail Racing – Elite performance e-commerce",
+        "Zonefloorball – Floorball gear store",
+        "Arbetsbyxor – Workwear store with CMS",
+      ];
+      const CARD_ASPECT = 3.5 / 2; // 1.75
+      const texLoader = new THREE.TextureLoader();
+      for (let i = 0; i < 4; i++) {
+        const mat = new THREE.MeshStandardMaterial({
+          color: pColors[i],
+          roughness: 0.6,
+          metalness: 0.1,
+        });
+        const p = new THREE.Mesh(new THREE.PlaneGeometry(3.5, 2), mat);
+        p.position.set(...pPos[i]);
+        p.userData.alt = pAlts[i];
+        // Load texture and apply object-cover centering once image dimensions are known
+        texLoader.load(pImages[i], (tex) => {
+          tex.colorSpace = THREE.SRGBColorSpace;
+          const imgAspect = tex.image.width / tex.image.height;
+          let rx, ry, ox, oy;
+          if (imgAspect > CARD_ASPECT) {
+            // Image wider → fit height, crop sides
+            rx = CARD_ASPECT / imgAspect;
+            ry = 1;
+            ox = (1 - rx) / 2;
+            oy = 0;
+          } else {
+            // Image taller → fit width, crop top/bottom
+            rx = 1;
+            ry = imgAspect / CARD_ASPECT;
+            ox = 0;
+            oy = (1 - ry) / 2;
+          }
+          tex.repeat.set(rx, ry);
+          tex.offset.set(ox, oy);
+          tex.wrapS = THREE.ClampToEdgeWrapping;
+          tex.wrapT = THREE.ClampToEdgeWrapping;
+          mat.map = tex;
+          mat.color.set(0xffffff);
+          mat.needsUpdate = true;
+        });
+        const border = new THREE.Mesh(
+          new THREE.BoxGeometry(3.6, 2.1, 0.1),
+          new THREE.MeshBasicMaterial({ color: pColors[i], wireframe: true }),
+        );
+        p.add(border);
+        scene.add(p);
+        panelMeshes.push(p);
+      }
+
+      // Z6: EDUCATION
+      const dodecahedron = new THREE.Mesh(
+        new THREE.DodecahedronGeometry(1.1),
+        new THREE.MeshBasicMaterial({
+          color: 0xc47a8a,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.4,
+        }),
+      );
+      dodecahedron.position.set(0, 2, -95);
+      scene.add(dodecahedron);
+      zoneShapes.push(dodecahedron);
+
+      const dipFrames = [];
+      const dipPos = [
+        [-4, 2.5, -92],
+        [0, 1.5, -96],
+        [4, 2.5, -92],
+      ];
+      const CERT_FRAME_ASPECT = 3 / 2; // BoxGeometry(3, 2, ...) → 1.5
+      const certData = [
+        {
+          src: "/cert-grade10.png",
+          title: "SEE — Grade 10 Marksheet",
+          sub: "Mount Everest Boarding · 2018",
+        },
+        null,
+        {
+          src: "/cert-transcript.png",
+          title: "+2 Science Transcript",
+          sub: "Kantipur College, Biratnagar · 2018–2020",
+        },
+      ];
+      for (let i = 0; i < 3; i++) {
+        const cd = certData[i];
+        const mat = new THREE.MeshStandardMaterial({
+          color: cd ? 0x1a2a50 : 0x3b7dd8,
+          emissive: cd ? 0x1a3070 : 0x1a3070,
+          emissiveIntensity: 0.25,
+        });
+        const f = new THREE.Mesh(new THREE.BoxGeometry(3, 2, 0.05), mat);
+        f.position.set(...dipPos[i]);
+        if (cd) {
+          f.userData.certSrc = cd.src;
+          f.userData.certTitle = cd.title;
+          f.userData.certSub = cd.sub;
+          texLoader.load(cd.src, (tex) => {
+            tex.colorSpace = THREE.SRGBColorSpace;
+            const imgAspect = tex.image.width / tex.image.height;
+            let rx, ry, ox, oy;
+            if (imgAspect > CERT_FRAME_ASPECT) {
+              rx = CERT_FRAME_ASPECT / imgAspect;
+              ry = 1;
+              ox = (1 - rx) / 2;
+              oy = 0;
+            } else {
+              rx = 1;
+              ry = imgAspect / CERT_FRAME_ASPECT;
+              ox = 0;
+              oy = (1 - ry) / 2;
+            }
+            tex.repeat.set(rx, ry);
+            tex.offset.set(ox, oy);
+            tex.wrapS = tex.wrapT = THREE.ClampToEdgeWrapping;
+            mat.map = tex;
+            mat.color.set(0xffffff);
+            mat.emissiveIntensity = 0.08;
+            mat.needsUpdate = true;
+          });
+        }
+        // Futuristic glow border
+        const borderCol = cd ? 0x4a8aff : 0x3b7dd8;
+        const border = new THREE.Mesh(
+          new THREE.BoxGeometry(3.1, 2.1, 0.06),
+          new THREE.MeshBasicMaterial({
+            color: borderCol,
+            wireframe: true,
+            transparent: true,
+            opacity: cd ? 0.6 : 0.4,
+          }),
+        );
+        f.add(border);
+        scene.add(f);
+        dipFrames.push(f);
+      }
+
+      // Raycasting — click cert frames to open modal
+      {
+        const certRaycaster = new THREE.Raycaster();
+        const certMouse = new THREE.Vector2();
+        const certClickable = [dipFrames[0], dipFrames[2]];
+        const hoverScale = { 0: 1, 2: 1 };
+
+        function castCert(clientX, clientY) {
+          const rect = renderer.domElement.getBoundingClientRect();
+          certMouse.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+          certMouse.y = ((clientY - rect.top) / rect.height) * -2 + 1;
+          certRaycaster.setFromCamera(certMouse, camera);
+          return certRaycaster.intersectObjects(certClickable, true);
+        }
+
+        // Helper — resolve the root dipFrame from a hit object
+        function certFromHit(hit) {
+          let o = hit.object;
+          while (o) {
+            if (o.userData && o.userData.certSrc) return o;
+            o = o.parent;
+          }
+          return null;
+        }
+
+        // Click → open modal (listen on window; canvas has pointer-events:none)
+        window.addEventListener("click", (e) => {
+          if (document.getElementById("cert-modal").classList.contains("open"))
+            return;
+          const hits = castCert(e.clientX, e.clientY);
+          if (!hits.length) return;
+          const frame = certFromHit(hits[0]);
+          if (frame)
+            openCertModal(
+              frame.userData.certSrc,
+              frame.userData.certTitle,
+              frame.userData.certSub,
+            );
+        });
+
+        // Touch tap → open modal
+        window.addEventListener(
+          "touchend",
+          (e) => {
+            if (
+              document.getElementById("cert-modal").classList.contains("open")
+            )
+              return;
+            const t = e.changedTouches[0];
+            const hits = castCert(t.clientX, t.clientY);
+            if (!hits.length) return;
+            const frame = certFromHit(hits[0]);
+            if (frame) {
+              e.preventDefault();
+              openCertModal(
+                frame.userData.certSrc,
+                frame.userData.certTitle,
+                frame.userData.certSub,
+              );
+            }
+          },
+          { passive: false },
+        );
+
+        // Hover — scale feedback (also on window since canvas ignores pointer events)
+        window.addEventListener("mousemove", (e) => {
+          if (document.getElementById("cert-modal").classList.contains("open"))
+            return;
+          const hits = castCert(e.clientX, e.clientY);
+          certClickable.forEach((cf) => {
+            const isHit = hits.length > 0 && certFromHit(hits[0]) === cf;
+            const target = isHit ? 1.06 : 1.0;
+            cf.scale.lerp(new THREE.Vector3(target, target, target), 0.14);
+          });
+        });
+      }
+
+      // Z7: CONTACT
+      const portalGrp = new THREE.Group();
+      portalGrp.position.set(0, 2, -108);
+      const portalOuter = new THREE.Mesh(
+        new THREE.SphereGeometry(1.8, 32, 32),
+        new THREE.MeshBasicMaterial({
+          color: 0x3b7dd8,
+          wireframe: true,
+          transparent: true,
+          opacity: 0.2,
+        }),
+      );
+      const portalInner = new THREE.Mesh(
+        new THREE.SphereGeometry(1.2, 32, 32),
+        new THREE.MeshStandardMaterial({
+          color: 0x04030a,
+          emissive: 0x3b7dd8,
+          emissiveIntensity: 0.08,
+        }),
+      );
+      const satRing1 = new THREE.Mesh(
+        new THREE.RingGeometry(2.2, 2.5, 64),
+        new THREE.MeshBasicMaterial({
+          color: 0x3b7dd8,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.25,
+        }),
+      );
+      satRing1.rotation.x = Math.PI * 0.3;
+      const satRing2 = new THREE.Mesh(
+        new THREE.RingGeometry(2.8, 3.0, 64),
+        new THREE.MeshBasicMaterial({
+          color: 0xc9a84c,
+          side: THREE.DoubleSide,
+          transparent: true,
+          opacity: 0.15,
+        }),
+      );
+      satRing2.rotation.x = Math.PI * 0.25;
+      satRing2.rotation.z = Math.PI * 0.1;
+      portalGrp.add(portalOuter, portalInner, satRing1, satRing2);
+      scene.add(portalGrp);
+
+      const linkedInSphere = new THREE.Mesh(
+        new THREE.SphereGeometry(0.5),
+        new THREE.MeshStandardMaterial({ color: 0x3b7dd8 }),
+      );
+      const githubSphere = new THREE.Mesh(
+        new THREE.SphereGeometry(0.5),
+        new THREE.MeshStandardMaterial({ color: 0x8a8070 }),
+      );
+      scene.add(linkedInSphere);
+      scene.add(githubSphere);
+
+      // --- GALAXY ARCHITECTURE ---
+      const isMobile = window.innerWidth < 768;
+      const galaxyParams = {
+        count: isMobile ? 25000 : 80000,
+        arms: 5,
+        radius: 28,
+        spin: 1.8,
+        randomness: 0.5,
+        randomnessPower: 3.2,
+        insideColor: "#c9a84c", // warm gold at galactic core
+        outsideColor: "#1b3a6b", // deep blue at outer arms
+        coreColor: "#fff4e0", // bright warm white at very center
+        thickness: 2.2, // vertical thickness of disk
+      };
+
+      // PARTICLE GENERATION ALGORITHM:
+      const positions = new Float32Array(galaxyParams.count * 3);
+      const colors = new Float32Array(galaxyParams.count * 3);
+      const scales = new Float32Array(galaxyParams.count);
+
+      const colorInside = new THREE.Color(galaxyParams.insideColor);
+      const colorOutside = new THREE.Color(galaxyParams.outsideColor);
+      const colorCore = new THREE.Color(galaxyParams.coreColor);
+
+      for (let i = 0; i < galaxyParams.count; i++) {
+        const i3 = i * 3;
+
+        // Distance from center (not uniform — bias toward center)
+        const radius = Math.pow(Math.random(), 0.6) * galaxyParams.radius;
+
+        // Which spiral arm
+        const arm = i % galaxyParams.arms;
+        const armAngle = (arm / galaxyParams.arms) * Math.PI * 2;
+
+        // Spiral twist (more twist farther from center)
+        const spinAngle = radius * galaxyParams.spin;
+
+        // Random scatter (less at center, more at edges)
+        const randomX =
+          Math.pow(Math.random(), galaxyParams.randomnessPower) *
+          (Math.random() < 0.5 ? 1 : -1) *
+          galaxyParams.randomness *
+          radius;
+        const randomY =
+          Math.pow(Math.random(), galaxyParams.randomnessPower) *
+          (Math.random() < 0.5 ? 1 : -1) *
+          galaxyParams.randomness *
+          galaxyParams.thickness *
+          (1 - radius / galaxyParams.radius);
+        const randomZ =
+          Math.pow(Math.random(), galaxyParams.randomnessPower) *
+          (Math.random() < 0.5 ? 1 : -1) *
+          galaxyParams.randomness *
+          radius;
+
+        positions[i3] = Math.cos(armAngle + spinAngle) * radius + randomX;
+        positions[i3 + 1] = randomY;
+        positions[i3 + 2] = Math.sin(armAngle + spinAngle) * radius + randomZ;
+
+        // Color: white core → gold mid → blue outer
+        const mixedColor = colorInside.clone();
+        if (radius < 2) {
+          mixedColor.lerp(colorCore, 1 - radius / 2);
+        } else {
+          mixedColor.lerp(colorOutside, radius / galaxyParams.radius);
+        }
+
+        colors[i3] = mixedColor.r;
+        colors[i3 + 1] = mixedColor.g;
+        colors[i3 + 2] = mixedColor.b;
+
+        // Size variation: bigger at core, smaller at edges
+        scales[i] =
+          Math.random() * 1.5 + (1 - radius / galaxyParams.radius) * 2;
+      }
+
+      const galaxyGeometry = new THREE.BufferGeometry();
+      galaxyGeometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(positions, 3),
+      );
+      galaxyGeometry.setAttribute(
+        "color",
+        new THREE.BufferAttribute(colors, 3),
+      );
+      galaxyGeometry.setAttribute(
+        "aScale",
+        new THREE.BufferAttribute(scales, 1),
+      );
+
+      // GALAXY SHADER MATERIAL
+      const galaxyMaterial = new THREE.ShaderMaterial({
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        vertexColors: true,
+        transparent: true,
+        uniforms: {
+          uOpacity: { value: 0.6 },
+        },
+
+        vertexShader: `
+          attribute float aScale;
+          varying vec3 vColor;
+          varying float vDistance;
+          
+          void main() {
+            vColor = color;
+            vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+            vec4 viewPosition = viewMatrix * modelPosition;
+            vec4 projectedPosition = projectionMatrix * viewPosition;
+            gl_Position = projectedPosition;
+            
+            vDistance = length(position.xz);
+            gl_PointSize = aScale * (200.0 / -viewPosition.z);
+            gl_PointSize = clamp(gl_PointSize, 0.5, ${isMobile ? "6.0" : "8.0"});
+          }
+        `,
+
+        fragmentShader: `
+          varying vec3 vColor;
+          varying float vDistance;
+          uniform float uOpacity;
+          
+          void main() {
+            // Soft circle with glow falloff
+            float distToCenter = distance(gl_PointCoord, vec2(0.5));
+            float strength = 1.0 - (distToCenter * 2.0);
+            strength = pow(strength, 3.0);
+            
+            // Extra glow for core particles
+            float coreGlow = max(0.0, 1.0 - vDistance / 4.0);
+            strength += coreGlow * 0.3;
+            
+            if(strength < 0.01) discard;
+            
+            gl_FragColor = vec4(vColor, strength * uOpacity);
+          }
+        `,
+      });
+
+      const galaxy = new THREE.Points(galaxyGeometry, galaxyMaterial);
+      galaxy.frustumCulled = false;
+
+      // Helper: createGlowTexture
+      function createGlowTexture(color, size) {
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+        const gradient = ctx.createRadialGradient(
+          size / 2,
+          size / 2,
+          0,
+          size / 2,
+          size / 2,
+          size / 2,
+        );
+        gradient.addColorStop(0, color);
+        gradient.addColorStop(0.3, color + "88");
+        gradient.addColorStop(1, color + "00");
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, size, size);
+        return new THREE.CanvasTexture(canvas);
+      }
+
+      // Core sprite 1 — tight bright center
+      const coreTexture = createGlowTexture("#fff4e0", 128);
+      const coreSprite = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+          map: coreTexture,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          opacity: 0.9,
+          depthWrite: false,
+        }),
+      );
+      coreSprite.scale.set(3, 3, 1);
+      coreSprite.position.set(0, 0, 0);
+      galaxy.add(coreSprite);
+
+      // Core sprite 2 — wide soft glow
+      const haloTexture = createGlowTexture("#c9a84c", 256);
+      const haloSprite = new THREE.Sprite(
+        new THREE.SpriteMaterial({
+          map: haloTexture,
+          transparent: true,
+          blending: THREE.AdditiveBlending,
+          opacity: 0.35,
+          depthWrite: false,
+        }),
+      );
+      haloSprite.scale.set(12, 12, 1);
+      haloSprite.position.set(0, 0, 0);
+      galaxy.add(haloSprite);
+
+      // GALAXY DUST LANES
+      const dustLaneParams = {
+        count: 2000,
+        arms: 5,
+        radius: 28,
+        spin: 1.8,
+        randomness: 0.6,
+        randomnessPower: 2.8,
+        thickness: 1.8,
+      };
+
+      const dustLanePos = new Float32Array(dustLaneParams.count * 3);
+      const dustLaneScales = new Float32Array(dustLaneParams.count);
+
+      for (let i = 0; i < dustLaneParams.count; i++) {
+        const i3 = i * 3;
+        const radius = Math.pow(Math.random(), 0.7) * dustLaneParams.radius;
+        const arm = i % dustLaneParams.arms;
+        const armAngle = (arm / dustLaneParams.arms) * Math.PI * 2 + 0.35;
+        const spinAngle = radius * dustLaneParams.spin;
+
+        const randomX =
+          Math.pow(Math.random(), dustLaneParams.randomnessPower) *
+          (Math.random() < 0.5 ? 1 : -1) *
+          dustLaneParams.randomness *
+          radius;
+        const randomY =
+          Math.pow(Math.random(), dustLaneParams.randomnessPower) *
+          (Math.random() < 0.5 ? 1 : -1) *
+          dustLaneParams.randomness *
+          dustLaneParams.thickness *
+          (1 - radius / dustLaneParams.radius);
+        const randomZ =
+          Math.pow(Math.random(), dustLaneParams.randomnessPower) *
+          (Math.random() < 0.5 ? 1 : -1) *
+          dustLaneParams.randomness *
+          radius;
+
+        dustLanePos[i3] = Math.cos(armAngle + spinAngle) * radius + randomX;
+        dustLanePos[i3 + 1] = randomY;
+        dustLanePos[i3 + 2] = Math.sin(armAngle + spinAngle) * radius + randomZ;
+
+        dustLaneScales[i] = Math.random() * 1.5 + 1.5;
+      }
+
+      const dustLaneGeometry = new THREE.BufferGeometry();
+      dustLaneGeometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(dustLanePos, 3),
+      );
+      dustLaneGeometry.setAttribute(
+        "aScale",
+        new THREE.BufferAttribute(dustLaneScales, 1),
+      );
+
+      const dustLaneMaterial = new THREE.ShaderMaterial({
+        depthWrite: false,
+        blending: THREE.NormalBlending,
+        transparent: true,
+        uniforms: {
+          uOpacity: { value: 0.4 },
+        },
+        vertexShader: `
+          attribute float aScale;
+          void main() {
+            vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+            vec4 viewPosition = viewMatrix * modelPosition;
+            gl_Position = projectionMatrix * viewPosition;
+            gl_PointSize = aScale * (200.0 / -viewPosition.z);
+            gl_PointSize = clamp(gl_PointSize, 1.0, 10.0);
+          }
+        `,
+        fragmentShader: `
+          uniform float uOpacity;
+          void main() {
+            float distToCenter = distance(gl_PointCoord, vec2(0.5));
+            float strength = 1.0 - (distToCenter * 2.0);
+            strength = clamp(pow(strength, 2.0), 0.0, 1.0);
+            if(strength < 0.01) discard;
+            gl_FragColor = vec4(0.05, 0.04, 0.1, strength * uOpacity);
+          }
+        `,
+      });
+
+      const dustLanes = new THREE.Points(dustLaneGeometry, dustLaneMaterial);
+      dustLanes.frustumCulled = false;
+      galaxy.add(dustLanes);
+
+      // GLOBULAR CLUSTERS (6 of them)
+      const clusterMaterial = new THREE.ShaderMaterial({
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        transparent: true,
+        uniforms: {
+          uOpacity: { value: 0.6 },
+        },
+        vertexShader: `
+          attribute float aScale;
+          void main() {
+            vec4 modelPosition = modelMatrix * vec4(position, 1.0);
+            vec4 viewPosition = viewMatrix * modelPosition;
+            gl_Position = projectionMatrix * viewPosition;
+            gl_PointSize = aScale * (200.0 / -viewPosition.z);
+            gl_PointSize = clamp(gl_PointSize, 0.5, 4.0);
+          }
+        `,
+        fragmentShader: `
+          uniform float uOpacity;
+          void main() {
+            float distToCenter = distance(gl_PointCoord, vec2(0.5));
+            float strength = 1.0 - (distToCenter * 2.0);
+            strength = pow(strength, 3.0);
+            if(strength < 0.01) discard;
+            gl_FragColor = vec4(1.0, 0.95, 0.88, strength * uOpacity);
+          }
+        `,
+      });
+
+      const clusterList = [];
+      for (let c = 0; c < 6; c++) {
+        const clusterCount = 200;
+        const clusterPos = new Float32Array(clusterCount * 3);
+        const clusterScales = new Float32Array(clusterCount);
+
+        for (let i = 0; i < clusterCount; i++) {
+          const i3 = i * 3;
+          const clusterRadius = Math.pow(Math.random(), 1.5) * 4;
+          const phi = Math.random() * Math.PI * 2;
+          const theta = Math.acos(Math.random() * 2 - 1);
+
+          clusterPos[i3] = Math.sin(theta) * Math.cos(phi) * clusterRadius;
+          clusterPos[i3 + 1] = Math.sin(theta) * Math.sin(phi) * clusterRadius;
+          clusterPos[i3 + 2] = Math.cos(theta) * clusterRadius;
+
+          clusterScales[i] = Math.random() * 0.4 + 0.8;
+        }
+
+        const clusterGeometry = new THREE.BufferGeometry();
+        clusterGeometry.setAttribute(
+          "position",
+          new THREE.BufferAttribute(clusterPos, 3),
+        );
+        clusterGeometry.setAttribute(
+          "aScale",
+          new THREE.BufferAttribute(clusterScales, 1),
+        );
+
+        const clusterPoints = new THREE.Points(
+          clusterGeometry,
+          clusterMaterial,
+        );
+        clusterPoints.frustumCulled = false;
+
+        const haloPhi = Math.random() * Math.PI * 2;
+        const haloTheta = Math.acos(Math.random() * 2 - 1);
+        const haloDist = 15 + Math.random() * 7;
+
+        clusterPoints.position.set(
+          Math.sin(haloTheta) * Math.cos(haloPhi) * haloDist,
+          (Math.random() - 0.5) * 8,
+          Math.sin(haloTheta) * Math.sin(haloPhi) * haloDist,
+        );
+
+        galaxy.add(clusterPoints);
+        clusterList.push(clusterPoints);
+      }
+
+      // GALAXY LENSING HINT
+      const lensRingGeo = new THREE.RingGeometry(14, 15, 64);
+      const lensRingMat = new THREE.MeshBasicMaterial({
+        color: 0xc9a84c,
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+        side: THREE.DoubleSide,
+      });
+      const lensRing = new THREE.Mesh(lensRingGeo, lensRingMat);
+      lensRing.rotation.x = Math.PI / 2;
+      galaxy.add(lensRing);
+
+      // GALAXY INITIAL PLACEMENT
+      galaxy.position.set(0, 8, -280);
+      galaxy.rotation.x = 0.35;
+      galaxy.rotation.z = 0.15;
+      galaxy.scale.setScalar(0.08);
+
+      scene.add(galaxy);
+
+      const galaxyStart = {
+        position: new THREE.Vector3(0, 8, -280),
+        rotationX: 0.35,
+        rotationZ: 0.15,
+        scale: 0.08,
+        opacity: 0.45,
+      };
+
+      const galaxyEnd = {
+        position: new THREE.Vector3(0, 0, -118),
+        rotationX: 0.18,
+        rotationZ: 0.08,
+        scale: 1.0,
+        opacity: 1.0,
+      };
+
+      function updateGalaxy(scrollProgress, time) {
+        const galaxyProgress = Math.max(0, (scrollProgress - 0.35) / 0.65);
+        const eased =
+          galaxyProgress < 0.5
+            ? 4 * galaxyProgress * galaxyProgress * galaxyProgress
+            : 1 - Math.pow(-2 * galaxyProgress + 2, 3) / 2;
+
+        const baseGalaxyX = THREE.MathUtils.lerp(
+          galaxyStart.position.x,
+          galaxyEnd.position.x,
+          eased,
+        );
+        const baseGalaxyY = THREE.MathUtils.lerp(
+          galaxyStart.position.y,
+          galaxyEnd.position.y,
+          eased,
+        );
+        const baseGalaxyZ = THREE.MathUtils.lerp(
+          galaxyStart.position.z,
+          galaxyEnd.position.z,
+          eased,
+        );
+
+        const scale = THREE.MathUtils.lerp(
+          galaxyStart.scale,
+          galaxyEnd.scale,
+          eased,
+        );
+        galaxy.scale.setScalar(scale);
+
+        galaxy.position.x =
+          baseGalaxyX + Math.sin(time * 0.25) * (-0.3 * scale);
+        galaxy.position.y = baseGalaxyY;
+        galaxy.position.z = baseGalaxyZ;
+
+        galaxy.rotation.x = THREE.MathUtils.lerp(
+          galaxyStart.rotationX,
+          galaxyEnd.rotationX,
+          eased,
+        );
+        galaxy.rotation.z = THREE.MathUtils.lerp(
+          galaxyStart.rotationZ,
+          galaxyEnd.rotationZ,
+          eased,
+        );
+
+        const opacity = THREE.MathUtils.lerp(0.45, 1.0, eased);
+        galaxyMaterial.uniforms.uOpacity.value = opacity;
+        dustLaneMaterial.uniforms.uOpacity.value = opacity * 0.4;
+        clusterMaterial.uniforms.uOpacity.value = opacity * 0.6;
+
+        galaxy.rotation.y += 0.0008;
+
+        const coreIntensity = THREE.MathUtils.lerp(0.4, 0.95, eased);
+        coreSprite.material.opacity = coreIntensity;
+        haloSprite.material.opacity = THREE.MathUtils.lerp(0.15, 0.5, eased);
+        haloSprite.scale.setScalar(THREE.MathUtils.lerp(8, 18, eased));
+
+        if (scale >= 0.8) {
+          lensRingMat.opacity = ((scale - 0.8) / 0.2) * 0.04;
+        } else {
+          lensRingMat.opacity = 0;
+        }
+      }
+
+      // --- CERTIFICATE MODAL ---
+      (function () {
+        const modal = document.getElementById("cert-modal");
+        const backdrop = document.getElementById("cert-modal-backdrop");
+        const closeBtn = document.getElementById("cert-modal-close");
+        const img = document.getElementById("cert-modal-img");
+        const titleEl = document.getElementById("cert-modal-title");
+        const subEl = document.getElementById("cert-modal-sub");
+
+        window.openCertModal = function (src, title, sub) {
+          img.src = src;
+          img.alt = title;
+          titleEl.textContent = title;
+          subEl.textContent = sub;
+          modal.classList.add("open");
+          document.body.style.overflow = "hidden";
+          closeBtn.focus();
+        };
+
+        function closeCertModal() {
+          modal.classList.remove("open");
+          document.body.style.overflow = "";
+          img.src = "";
+        }
+
+        closeBtn.addEventListener("click", closeCertModal);
+        backdrop.addEventListener("click", closeCertModal);
+        document.addEventListener("keydown", (e) => {
+          if (e.key === "Escape" && modal.classList.contains("open"))
+            closeCertModal();
+        });
+        // Prevent content clicks from bubbling to backdrop
+        document
+          .getElementById("cert-modal-content")
+          .addEventListener("click", (e) => e.stopPropagation());
+      })();
+
+      // --- LOGIC & SCROLL ---
+      let targetScrollY = 0;
+      let currentScrollY = 0;
+      let maxScroll = 1;
+      let currentZoneId = 0;
+      let started = false;
+
+      const infoPanel = document.getElementById("info-panel");
+      const heroOverlay = document.getElementById("hero-overlay");
+      const timelineUI = document.getElementById("timeline");
+      const scrollHint = document.getElementById("scroll-hint");
+
+      // Film grain setup
+      const grainCanvas = document.getElementById("grain-canvas");
+      grainCanvas.width = 200;
+      grainCanvas.height = 200;
+      const gc = grainCanvas.getContext("2d");
+      const imgData = gc.createImageData(200, 200);
+      for (let i = 0; i < imgData.data.length; i += 4) {
+        const v = Math.random() * 255 * 0.03;
+        imgData.data[i] = imgData.data[i + 1] = imgData.data[i + 2] = v;
+        imgData.data[i + 3] = 255;
+      }
+      gc.putImageData(imgData, 0, 0);
+      grainCanvas.style.backgroundImage = `url(${grainCanvas.toDataURL()})`;
+      grainCanvas.style.backgroundRepeat = "repeat";
+      grainCanvas.width = 1;
+      grainCanvas.height = 1;
+
+      // Custom cursor (desktop only)
+      if (window.matchMedia("(pointer: fine)").matches) {
+        document.body.style.cursor = "none";
+        const ring = document.getElementById("cursor-ring");
+        const dot = document.getElementById("cursor-dot");
+        let mx = 0,
+          my = 0,
+          rx = 0,
+          ry = 0;
+        window.addEventListener("mousemove", (e) => {
+          mx = e.clientX;
+          my = e.clientY;
+        });
+        (function animCursor() {
+          rx += (mx - rx) * 0.12;
+          ry += (my - ry) * 0.12;
+          ring.style.left = rx + "px";
+          ring.style.top = ry + "px";
+          dot.style.left = mx + "px";
+          dot.style.top = my + "px";
+          requestAnimationFrame(animCursor);
+        })();
+        document.querySelectorAll("a,button,.hud-zone-item").forEach((el) => {
+          el.addEventListener("mouseenter", () => {
+            ring.style.width = "56px";
+            ring.style.height = "56px";
+            ring.style.opacity = "0.4";
+          });
+          el.addEventListener("mouseleave", () => {
+            ring.style.width = "28px";
+            ring.style.height = "28px";
+            ring.style.opacity = "1";
+          });
+        });
+      }
+
+      function updateMaxScroll() {
+        maxScroll = Math.max(
+          1,
+          document.getElementById("scroll-container").offsetHeight -
+            window.innerHeight,
+        );
+      }
+
+      window.addEventListener("resize", () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.fov = window.innerWidth < 768 ? 75 : 55;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        updateMaxScroll();
+      });
+
+      window.addEventListener("scroll", () => {
+        if (!started) return;
+        targetScrollY = window.scrollY;
+      });
+
+      let touchStartY = 0;
+      window.addEventListener(
+        "touchstart",
+        (e) => {
+          touchStartY = e.touches[0].clientY;
+        },
+        { passive: false },
+      );
+      window.addEventListener(
+        "touchmove",
+        (e) => {
+          if (!started) return;
+          const delta = touchStartY - e.touches[0].clientY;
+          targetScrollY = Math.max(
+            0,
+            Math.min(maxScroll, targetScrollY + delta * 2.5),
+          );
+          touchStartY = e.touches[0].clientY;
+        },
+        { passive: false },
+      );
+
+      // Initialize scene
+      setTimeout(() => {
+        document.querySelector(".loading-dots").style.display = "none";
+        document.getElementById("enter-btn").style.display = "block";
+      }, 1500);
+
+      document.getElementById("enter-btn").addEventListener("click", () => {
+        gsap.to("#start-screen", {
+          opacity: 0,
+          duration: 0.8,
+          onComplete: () => {
+            document.getElementById("start-screen").style.display = "none";
+            started = true;
+            updateMaxScroll();
+          },
+        });
+      });
+
+      // Setup minimap clicks (HUD Left)
+      document.querySelectorAll(".hud-zone-item").forEach((node) => {
+        node.addEventListener("click", () => {
+          const z = parseInt(node.getAttribute("data-zone"));
+          const targetProg = (z - 1) / 6;
+          window.scrollTo({
+            top: targetProg * maxScroll,
+            behavior: "smooth",
+          });
+        });
+      });
+
+      function updateHUD(prog, zoneId) {
+        document.getElementById("hud-pct-label").textContent =
+          Math.round(prog * 100) + "%";
+        document.querySelectorAll(".hud-zone-item").forEach((el) => {
+          const z = parseInt(el.dataset.zone);
+          el.classList.remove("active", "done");
+          if (z === zoneId) el.classList.add("active");
+          else if (z < zoneId) el.classList.add("done");
+        });
+      }
+
+      function changeZone(zone) {
+        if (currentZoneId === zone.id) return;
+        currentZoneId = zone.id;
+
+        // Sweep line
+        const sweep = document.getElementById("sweep-line");
+        gsap.fromTo(
+          sweep,
+          { top: "-2px", opacity: 1 },
+          {
+            top: "100%",
+            duration: 0.6,
+            ease: "power2.in",
+            onComplete: () => (sweep.style.opacity = 0),
+          },
+        );
+
+        // Panel
+        if (zone.id === 1) {
+          infoPanel.classList.remove("visible");
+        } else {
+          gsap.to(infoPanel, {
+            opacity: 0,
+            x: 40,
+            duration: 0.25,
+            onComplete: () => {
+              document.getElementById("panel-tag").innerText = zone.tag;
+              document.getElementById("panel-title").innerText = zone.title;
+              document.getElementById("panel-sub").innerText = zone.sub;
+              document.getElementById("panel-body").innerHTML = zone.body;
+              infoPanel.classList.add("visible");
+              gsap.to(infoPanel, {
+                opacity: 1,
+                x: 0,
+                duration: 0.4,
+                ease: "power2.out",
+              });
+            },
+          });
+        }
+
+        // Timeline
+        if (zone.id === 4) {
+          timelineUI.classList.add("visible");
+          gsap.to(".timeline-node", {
+            x: 0,
+            opacity: 1,
+            stagger: 0.3,
+            duration: 0.6,
+            ease: "power2.out",
+          });
+        } else {
+          timelineUI.classList.remove("visible");
+          gsap.to(".timeline-node", { x: -20, opacity: 0, duration: 0.2 });
+        }
+
+        // Hints
+        if (zone.id > 1) {
+          gsap.to(scrollHint, { opacity: 0, duration: 0.5 });
+          gsap.to(heroOverlay, { opacity: 0, x: -40, duration: 0.5 });
+        } else {
+          gsap.to(scrollHint, { opacity: 1, duration: 0.5 });
+          gsap.to(heroOverlay, { opacity: 1, x: 0, duration: 0.5 });
+        }
+
+        updateHUD(currentScrollY / maxScroll, zone.id);
+      }
+
+      // --- ANIMATION LOOP ---
+      const clock = new THREE.Clock();
+
+      function animate() {
+        requestAnimationFrame(animate);
+        const t = clock.getElapsedTime();
+
+        if (started) {
+          currentScrollY += (targetScrollY - currentScrollY) * 0.08;
+          const scrollProgress = currentScrollY / maxScroll;
+
+          // Camera path
+          const camZ = 12 - scrollProgress * 130;
+          camera.position.z = camZ;
+          camera.position.y = 3 + Math.sin(scrollProgress * Math.PI * 10) * 0.5;
+          camera.position.x = Math.sin(scrollProgress * Math.PI * 6) * 1.5;
+
+          // Zone detection
+          let currentZone = ZONES_DATA[0];
+          for (let z of ZONES_DATA) {
+            if (camZ <= z.zRange[0] && camZ > z.zRange[1]) {
+              currentZone = z;
+              break;
+            }
+          }
+          changeZone(currentZone);
+          updateHUD(scrollProgress, currentZone.id);
+          updateGalaxy(scrollProgress, t);
+
+          mainLight.position.set(
+            camera.position.x,
+            camera.position.y + 2,
+            camera.position.z - 5,
+          );
+          mainLight.intensity = 2 + Math.sin(t * 2) * 0.5;
+        }
+
+        // Star twinkle
+        for (let mat of starMaterials) {
+          if (Math.random() < 0.1) mat.opacity = 0.4 + Math.random() * 0.6;
+        }
+
+        // Nebula dust rotation
+        dustGroup.rotation.y += 0.0001;
+
+        // Vein pulse
+        for (let i = 0; i < veinMats.length; i++) {
+          veinMats[i].opacity = 0.5 + Math.sin(t * 1.2 + i) * 0.2;
+        }
+
+        // Z1: Hero objects
+        if (zoneShapes[0] && zoneShapes[1]) {
+          zoneShapes[0].rotation.y += 0.003;
+          zoneShapes[0].rotation.x += 0.001;
+          zoneShapes[1].rotation.y += 0.003;
+          zoneShapes[1].rotation.x += 0.001;
+        }
+
+        // Z2: About objects
+        torus.rotation.x += 0.01;
+        torus.rotation.y += 0.005;
+        torus2.rotation.y -= 0.01;
+        torus2.rotation.z -= 0.005;
+
+        floatSprites.forEach((sp, i) => {
+          sp.position.y += Math.sin(t * 2 + i) * 0.005;
+        });
+
+        // Z3: Skills
+        octahedron.rotation.x += 0.005;
+        octahedron.rotation.y += 0.005;
+
+        skillOrbs.forEach((o, i) => {
+          const angle = t * o.speed + o.offset;
+          o.mesh.position.x = o.zoneX + Math.cos(angle) * o.radius;
+          o.mesh.position.z = o.zoneZ + Math.sin(angle) * o.radius;
+          o.mesh.position.y = o.baseY + Math.sin(t * 1.5 + i) * 0.5;
+          o.label.position.copy(o.mesh.position);
+          o.label.position.y += 0.4;
+        });
+
+        // Z4: Work Rings
+        workRings.forEach((r, i) => {
+          r.rotation.x += 0.01 + i * 0.005;
+          r.rotation.y += 0.01 + i * 0.005;
+        });
+
+        // Z5: Projects
+        torusKnot.rotation.x += 0.005;
+        torusKnot.rotation.y += 0.01;
+        torusKnot.rotation.z += 0.005;
+
+        panelMeshes.forEach((p, i) => {
+          p.position.y = 1 + Math.sin(t * 2 + i) * 0.2;
+          p.rotation.y = Math.sin(t + i) * 0.1;
+        });
+
+        // Z6: Education
+        dodecahedron.rotation.x += 0.005;
+        dodecahedron.rotation.y -= 0.008;
+
+        // Z7: Contact
+        portalOuter.rotation.y += 0.005;
+        portalOuter.rotation.x += 0.005;
+        portalInner.rotation.y -= 0.01;
+
+        const r1 = 3.5;
+        linkedInSphere.position.set(
+          Math.cos(t) * r1,
+          2 + Math.sin(t * 2) * 0.5,
+          -108 + Math.sin(t) * r1,
+        );
+        const r2 = 4.2;
+        githubSphere.position.set(
+          Math.cos(t + Math.PI) * r2,
+          2 + Math.sin(t * 2 + Math.PI) * 0.5,
+          -108 + Math.sin(t + Math.PI) * r2,
+        );
+
+        renderer.render(scene, camera);
+      }
+
+      animate();
+    </script>
+  </body>
+</html>
