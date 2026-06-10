@@ -901,6 +901,10 @@
         border-radius: 4px;
         pointer-events: none;
       }
+      .wave-char {
+        display: inline-block;
+        animation: wave 1.6s ease-in-out infinite;
+      }
       @media (max-width: 768px) {
         #cert-modal {
           padding: 10px;
@@ -923,6 +927,16 @@
           max-height: 60vh;
         }
       }
+
+      @keyframes wave {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-14px);
+        }
+      }
     </style>
   </head>
   <body>
@@ -933,13 +947,30 @@
     <canvas id="grain-canvas"></canvas>
     <div id="sweep-line"></div>
     <div id="cursor-ring"></div>
+    Roshan Neupane
+
     <div id="cursor-dot"></div>
 
     <div id="start-screen">
       <div id="ss-label" class="text-sm">
         Frontend Engineer · Kathmandu, Nepal
       </div>
-      <h1 id="ss-name">Roshan Neupane</h1>
+      <h1 id="ss-name">
+        <span class="wave-char" style="animation-delay: 0s">R</span>
+        <span class="wave-char" style="animation-delay: 0.09s">O</span>
+        <span class="wave-char" style="animation-delay: 0.18s">S</span>
+        <span class="wave-char" style="animation-delay: 0.27s">H</span>
+        <span class="wave-char" style="animation-delay: 0.36s">A</span>
+        <span class="wave-char" style="animation-delay: 0.45s">N</span>
+        &nbsp;
+        <span class="wave-char" style="animation-delay: 0.54s">N</span>
+        <span class="wave-char" style="animation-delay: 0.63s">E</span>
+        <span class="wave-char" style="animation-delay: 0.48s">U</span>
+        <span class="wave-char" style="animation-delay: 0.54s">P</span>
+        <span class="wave-char" style="animation-delay: 0.63s">A</span>
+        <span class="wave-char" style="animation-delay: 0.72s">N</span>
+        <span class="wave-char" style="animation-delay: 0.81s">E</span>
+      </h1>
       <p id="ss-desc">
         Building scalable interfaces with React, Next.js & TypeScript
       </p>
@@ -948,7 +979,7 @@
     </div>
 
     <div id="hero-overlay">
-      <h1>ROSHAN NEUPANE</h1>
+      <h1>Roshan Neupane</h1>
       <h2>Frontend Software Engineer</h2>
       <div class="hero-tags">
         <span class="pill">React</span>
@@ -1133,17 +1164,17 @@
           body: `
                     <div style="display:flex; flex-direction:column; gap:16px;">
                         <div>
-                            <strong style="color:#c9a84c">Reuseit.se</strong>
+                            <a href="https://reuseit.se" target="_blank" style="text-decoration: none;"><strong style="color:#c9a84c">Reuseit.se</strong></a>
                             <div style="color:rgba(255,255,255,0.7); font-size:14px; margin:4px 0;">Refurbished tech store. Mailchimp + Redis caching.</div>
                             <span class="tag-pill pink">Next.js</span><span class="tag-pill pink">Recombee</span>
                         </div>
                         <div>
-                            <strong style="color:#c9a84c">Zonefloorball</strong>
+                            <a href="https://zonefloorball.com" target="_blank" style="text-decoration: none;"><strong style="color:#c9a84c">Zonefloorball</strong></a>
                             <div style="color:rgba(255,255,255,0.7); font-size:14px; margin:4px 0;">Floorball gear store. Lipscore reviews.</div>
                             <span class="tag-pill pink">Next.js</span><span class="tag-pill pink">Redis</span>
                         </div>
                         <div>
-                            <strong style="color:#c9a84c">Arbetsbyxor</strong>
+                            <a href="https://arbetsbyxor.se" target="_blank" style="text-decoration: none;"><strong style="color:#c9a84c">Arbetsbyxor</strong></a>
                             <div style="color:rgba(255,255,255,0.7); font-size:14px; margin:4px 0;">Workwear store, solo-built CMS builder.</div>
                             <span class="tag-pill pink">Next.js</span><span class="tag-pill pink">Formik</span>
                         </div>
